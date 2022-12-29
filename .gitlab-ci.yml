@@ -1,0 +1,23 @@
+stages: 
+  - deploy
+services:
+    - name: mysql:latest
+
+variables:
+  MYSQL_DATABASE: mysql_db
+  MYSQL_ROOT_PASSWORD: mysql
+
+deploy-job: 
+  image: python
+  stage: deploy 
+  before_script:
+    - pip3 install mysql-connector-python
+    - apt update -qy 
+    - apt-get install -qqy --no-install-recommends default-mysql-client
+    - mysql --user=root --password="$MYSQL_ROOT_PASSWORD" --host=mysql "$MYSQL_DATABASE" < initDB.sql
+  script:
+    - mysql --user=root --password="$MYSQL_ROOT_PASSWORD" --host=mysql "$MYSQL_DATABASE"
+    - python3 lab2.py > answer.txt
+  artifacts:
+    paths:
+      - answer.txt
